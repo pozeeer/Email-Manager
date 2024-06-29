@@ -3,13 +3,13 @@ from django.contrib import admin
 from .models import *
 
 
-# class MailServicesAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'title', 'imap')
-#     list_display_links = ('id', 'title')
-#
-#     class Meta:
-#         verbose_name = 'Почтовый сервис'
-#         verbose_name_plural = 'Почтовые сервисы'
+class MailServicesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'imap')
+    list_display_links = ('id', 'title')
+
+    class Meta:
+        verbose_name = 'Почтовый сервис'
+        verbose_name_plural = 'Почтовые сервисы'
 
 
 class EmailAccountAdmin(admin.ModelAdmin):
@@ -30,6 +30,6 @@ class LettersInfoAdmin(admin.ModelAdmin):
         verbose_name_plural = 'Информация о письмах'
 
 
-admin.site.register(MailServices)
+admin.site.register(MailServices, MailServicesAdmin)
 admin.site.register(EmailAccount, EmailAccountAdmin)
 admin.site.register(LettersInfo, LettersInfoAdmin)
