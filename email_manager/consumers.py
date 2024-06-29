@@ -66,7 +66,6 @@ class ProgressBarConsumer(AsyncWebsocketConsumer):
             attachments = 'нету приложенных файлов'
         else:
             attachments = letter.files_list
-            # date = letter.strftime("%d.%m.%Y %H:%M ")
         data = {
             'title': letter.title,
             'author': letter.author,
