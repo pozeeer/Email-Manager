@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Progress Bar</title>
+    <style>
+        #progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            margin: 50px 0;
+        }
+        #progress-bar div {
+            width: 0;
+            height: 30px;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+        #data-container {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .letter {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="progress-status"></h2> <!-- Added this line -->
+    <div id="progress-bar">
+        <div id="progress"></div>
+    </div>
+    <div id="data-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Content</th>
+                    <th>Files List</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="letters-table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const progressBar = document.getElementById('progress');
+        const progressStatus = document.getElementById('progress-status'); // Added this line
+        const tableBody = document.getElementById('letters-table-body');
+
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/progress/');
+
+        let currentState = ''; // Added this line to track the current state
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.progress !== undefined) {
+                if (currentState !== 'Чтение  сообщений') { // Check if the state is changing
+                    currentState = 'Чтение  сообщений';
+                    progressStatus.textContent = currentState;
+                }
+                progressBar.style.width = data.progress + '%';
+                progressBar.textContent = data.progress + '%';
+            } else if (data.letter !== undefined) {
+                if (currentState !== 'Получение сообщений') { // Check if the state is changing
+                    currentState = 'Получение сообщений';
+                    progressStatus.textContent = currentState;
+                }
+                const letter = data.letter;
+
+                console.log(letter)
+                const row = document.createElement('tr');
+                row.className = 'letter';
+
+                const titleCell = document.createElement('td');
+                titleCell.textContent = letter.title;
+                row.appendChild(titleCell);
+
+                const authorCell = document.createElement('td');
+                authorCell.textContent = letter.author;
+                row.appendChild(authorCell);
+
+                const contentCell = document.createElement('td');
+                contentCell.textContent = letter.content.slice(0, 50) + '...';
+                row.appendChild(contentCell);
+
+                const filesListCell = document.createElement('td');
+                filesListCell.textContent = letter.files_list;
+                row.appendChild(filesListCell);
+
+                const dateCell = document.createElement('td');
+                dateCell.textContent = letter.date;
+                row.appendChild(dateCell);
+
+                tableBody.appendChild(row);
+            }
+        };
+
+        socket.onclose = function(event) {
+            console.error('WebSocket closed unexpectedly');
+        };
+    </script>
+</body>
+</html>
+
